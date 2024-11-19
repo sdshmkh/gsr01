@@ -1,0 +1,16 @@
+name: gsr
+channels:
+  - defaults
+  - conda-forge
+  - loopbio
+dependencies:
+  - numpy==1.26.4
+  - python=3.10
+  - pytorch::pytorch
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - tqdm
+  - cvxopt
+  - xgboost
+prefix: /opt/homebrew/Caskroom/miniconda/base/envs/gsr
