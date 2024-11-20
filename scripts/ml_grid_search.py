@@ -1,9 +1,10 @@
+import numpy as np
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
 
 from ml.models import compile_grid_search
-from utils.viz import plot_bar
+from utils.viz import plot_bar, cm_on_signal
 
 gsr_files =  {
     3: "gsr_latent_space_3.npz",
@@ -57,9 +58,16 @@ data_files = {
     'low_rank': low_rank_files
 }
 
+csv_dataset = 'gsr_data/contractive/gsr_data.csv'
+data_df = pd.read_csv(csv_dataset, skiprows=1)
+data_df = data_df[13000:]# skip the first 13k entries as they are exploratory
+signal = data_df['uS'].to_numpy()
+ground_truth = data_df['label'].to_numpy()
+
 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
 output_path = Path('outputs/results_{}'.format(timestamp))
-folder = 'outputs/2024-11-19 11:23/'
+
+folder = 'outputs/2024-11-19 15:00/'
 if not output_path.exists():
     output_path.mkdir(parents=True)
 
@@ -72,9 +80,9 @@ for data_type, files in data_files.items():
         all_models |= models
         results_df.to_csv(str(res_path))
         results_df['latent_space'] = k
-        results_df['model'] = results_df.index
-        results_df['grid_search'] = results_df['model'].apply(lambda x: x.split("-")[2])
-        results_df['model'] = results_df['model'].apply(lambda x: x.split("-")[3])
+        results_df['full_model'] = results_df.index
+        results_df['grid_search'] = results_df['full_model'].apply(lambda x: x.split("-")[2])
+        results_df['model'] = results_df['full_model'].apply(lambda x: x.split("-")[3])
     
         ls_df.append(results_df)
 
@@ -83,6 +91,11 @@ for data_type, files in data_files.items():
     spec_acc_df = merged_df[merged_df["grid_search"] == "specificity"]
     bal_acc_df = merged_df[merged_df["grid_search"] == "balanced_accuracy"]
 
+    best_model = merged_df[merged_df['balanced_accuracy'] == merged_df['balanced_accuracy'].max()]
     plot_bar(spec_acc_df, "balanced_accuracy", "Balanced Accuracy", " {} Latent Space - Train session 1&2, Test Session 3, Grid Search Metric - Speicificity".format(data_type))
     plot_bar(bal_acc_df, "balanced_accuracy", "Balanced Accuracy", " {} Latent Space - Train session 1&2, Test Session 3, Grid Search Metric - Balanced Accuracy".format(data_type))
-
+    
+    clf = best_model['full_model'].iloc[0]
+    latent_space_file = best_model['latent_space'].iloc[0]
+    title = "GSR Signal Predictions with {} dimension {} Latent Space {} model".format(data_type.upper(), latent_space_file, best_model['model'].iloc[0])
+    cm_on_signal(all_models[clf], folder + files[latent_space_file], signal, ground_truth, title)

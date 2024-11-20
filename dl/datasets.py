@@ -22,7 +22,7 @@ class GSRLowRankDataset(Dataset):
     data_matrix = signal.reshape(-1, 51)
     rpca.fit(data_matrix)
 
-    self.gsr_signal = torch.tensor(rpca.sparse_.reshape((self.num_windows, window, 1)), dtype=torch.float32)
+    self.gsr_signal = torch.tensor(rpca.low_rank_.reshape((self.num_windows, window, 1)), dtype=torch.float32)
 
     self.labels = np.array(self.df['label']).reshape((self.num_windows, window, 1))
     self.labels = np.array([np.argmax(np.bincount(self.labels[i].flatten())) for i in range(self.num_windows)])
