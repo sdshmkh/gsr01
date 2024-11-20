@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 from sklearn.preprocessing import  LabelBinarizer
 
@@ -206,6 +207,10 @@ classfiers = {'knn':KNNModels, 'rbf':Radial_SVMModels, 'svm':SVMModels, 'xgboost
 def compile_grid_search(folder, k, file_name, s_type=''):
   models = dict()
   file_name = folder + file_name
+
+  if not Path(file_name).exists():
+    return None, None
+  
   X_train, X_test, y_train, y_test = get_data_seq_samples(file_name, [0, 1], 2)
   res = list()
   for score in scoring:

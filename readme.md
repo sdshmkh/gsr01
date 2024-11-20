@@ -28,7 +28,7 @@ This will create a new output directory and store the generated latent spaces fo
 Next, run this after the previuos step to create a grid search with classical ML models like, K-Nearest Neighbours, Support Vector Machines, Linear and Radial Basis Function kernels and Xgboost. To do this run
 
 ```
-python -m scripts.ml_grid_search
+python -m scripts.ml_grid_search --input-folder path/to/latent/spaces
 ```
 
 This should output results in the output folder as stated above. The plots for visualizing the results are availabe in the viz folder. 

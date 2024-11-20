@@ -1,4 +1,5 @@
 import numpy as np
+import argparse
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
@@ -7,7 +8,11 @@ from ml.models import compile_grid_search
 from utils.viz import plot_bar, cm_on_signal
 
 ########### input ###########
-folder = 'gsr_data/contractive/'
+parser = argparse.ArgumentParser(description="Run a grid search for ML parameters.")
+parser.add_argument("--input_folder", type=str, help="Folder which contains latent spaces")
+args = parser.parse_args()
+
+folder = args.input_folder
 
 ls_type = {
     "low_rank": "Low Rank",
@@ -92,6 +97,8 @@ for data_type, files in data_files.items():
     ls_df = list()
     for k, v in files.items():
         models, results_df = compile_grid_search(folder, k, v, s_type=data_type)
+        if not (models and results_df):
+            continue
         res_path = output_path.joinpath('{}_results_{}.csv'.format(data_type, k))
         all_models |= models
         results_df.to_csv(str(res_path))
