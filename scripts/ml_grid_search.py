@@ -6,6 +6,16 @@ from datetime import datetime
 from ml.models import compile_grid_search
 from utils.viz import plot_bar, cm_on_signal
 
+########### input ###########
+folder = 'gsr_data/contractive/'
+
+ls_type = {
+    "low_rank": "Low Rank",
+    "phasic": "phasic",
+    "tonic":"Tonic",
+    "gsr": "Gsr", 
+}
+
 gsr_files =  {
     3: "gsr_latent_space_3.npz",
     6: "gsr_latent_space_6.npz",
@@ -58,6 +68,13 @@ data_files = {
     'low_rank': low_rank_files
 }
 
+models_name = {
+    'rbf': 'RBF SVM',
+    'svm': 'SVM',
+    'knn': 'K-NN',
+    'xgboost': 'Xgboost'
+}
+
 csv_dataset = 'gsr_data/contractive/gsr_data.csv'
 data_df = pd.read_csv(csv_dataset, skiprows=1)
 data_df = data_df[13000:]# skip the first 13k entries as they are exploratory
@@ -67,7 +84,6 @@ ground_truth = data_df['label'].to_numpy()
 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M')
 output_path = Path('outputs/results_{}'.format(timestamp))
 
-folder = 'outputs/2024-11-19 15:00/'
 if not output_path.exists():
     output_path.mkdir(parents=True)
 
@@ -97,5 +113,5 @@ for data_type, files in data_files.items():
     
     clf = best_model['full_model'].iloc[0]
     latent_space_file = best_model['latent_space'].iloc[0]
-    title = "GSR Signal Predictions with {} dimension {} Latent Space {} model".format(data_type.upper(), latent_space_file, best_model['model'].iloc[0])
+    title = "Predictions with {}-Dimension {} Latent Space {} model".format(latent_space_file, ls_type[data_type], models_name[best_model['model'].iloc[0]])
     cm_on_signal(all_models[clf], folder + files[latent_space_file], signal, ground_truth, title)

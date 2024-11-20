@@ -85,7 +85,7 @@ def cm_on_signal(clf, data_path, signal, ground_truth, title):
     plt.plot(fn, color='orange', linestyle='-', label="False Negative (FN)")
 
     plt.axvline(x=bounds[-2], color='black', linestyle='--')
-    plt.text(bounds[1]-1000, 0.49, "Test on Training data", color="black", fontsize=16)
+    plt.text(bounds[1]-1000, 0.49, "Training data", color="black", fontsize=16)
     plt.text(bounds[-1] - 5000, 0.49, "Test data", color="black", fontsize=16)
 
 
