@@ -5,13 +5,33 @@ import tqdm
 
 
 def get_arch(latent_space):
-  if latent_space == 96:
+  """
+    Returns a pytorch Sequential model for autoencoders and decoders based
+    on a specific latent_spaces. Supported latent spaces are 3, 6, 96, 128, 256, 512.
+
+    latent_space (int): Latent space size
+
+    returns: (nn.Sequential, nn.Sequential)
+  """
+  if latent_space == 3:
     enc = nn.Sequential(
-        nn.Linear(51, 96),
+        nn.Linear(51, 25),
+        nn.ReLU(),
+        nn.Linear(25, 12),
+        nn.ReLU(),
+        nn.Linear(12, 6),
+        nn.ReLU(),
+        nn.Linear(6, 3),
         nn.ReLU(),
     )
     dec = nn.Sequential(
-        nn.Linear(96, 51),
+        nn.Linear(3, 6),
+        nn.ReLU(),
+        nn.Linear(6, 12),
+        nn.ReLU(),
+        nn.Linear(12, 25),
+        nn.ReLU(),
+        nn.Linear(25, 51),
         nn.Sigmoid()
     )
     return enc, dec
@@ -33,25 +53,13 @@ def get_arch(latent_space):
         nn.Sigmoid()
    )
    return enc, dec
-  if latent_space == 3:
+  if latent_space == 96:
     enc = nn.Sequential(
-        nn.Linear(51, 25),
-        nn.ReLU(),
-        nn.Linear(25, 12),
-        nn.ReLU(),
-        nn.Linear(12, 6),
-        nn.ReLU(),
-        nn.Linear(6, 3),
+        nn.Linear(51, 96),
         nn.ReLU(),
     )
     dec = nn.Sequential(
-        nn.Linear(3, 6),
-        nn.ReLU(),
-        nn.Linear(6, 12),
-        nn.ReLU(),
-        nn.Linear(12, 25),
-        nn.ReLU(),
-        nn.Linear(25, 51),
+        nn.Linear(96, 51),
         nn.Sigmoid()
     )
     return enc, dec
@@ -136,18 +144,21 @@ class AutoEncoder(nn.Module):
       return self.encoder(x)
 
 def contractive_loss(model, output, target, lamda):
-    batch_size = output.shape[0]
-    fro_norm = 0.0
+  """
+    Contractive loss which add regularizations using the Jacobian of the latent space
+  """
+  batch_size = output.shape[0]
+  fro_norm = 0.0
 
-    for i in range(batch_size):
-        curr_target = target[i].unsqueeze(0)  # Add batch dimension for single sample
-        jac = torch.autograd.functional.jacobian(lambda x: model.get_latent_space(x), curr_target, create_graph=True)
+  for i in range(batch_size):
+      curr_target = target[i].unsqueeze(0)  # Add batch dimension for single sample
+      jac = torch.autograd.functional.jacobian(lambda x: model.get_latent_space(x), curr_target, create_graph=True)
 
-        fro_norm += torch.sum(jac ** 2)
+      fro_norm += torch.sum(jac ** 2)
 
-    mse = nn.functional.mse_loss(output, target)
+  mse = nn.functional.mse_loss(output, target)
 
-    return mse + lamda * (fro_norm / batch_size)
+  return mse + lamda * (fro_norm / batch_size)
 
 
 def training_loop(model, dl, val_dl, epochs, lr, lamda):

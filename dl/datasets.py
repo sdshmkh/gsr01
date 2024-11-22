@@ -7,6 +7,10 @@ from .rpca import RobustPCA
 from utils.cvxeda import cvxEDA
 
 class GSRLowRankDataset(Dataset):
+  """
+    GSRLowRankDataset performs Standard scaling and RPCA. After the processing, it windows the data 
+    by the given window size.
+  """
   def __init__(self, csv_file, window):
     super().__init__()
 
@@ -38,6 +42,10 @@ class GSRLowRankDataset(Dataset):
 
 
 class GSRDataset(Dataset):
+  """
+    GSRDataset performs Min-Max scaling. After the processing, it windows the data 
+    by the given window size.
+  """
   def __init__(self, csv_file, window):
     super().__init__()
 
@@ -66,6 +74,10 @@ class GSRDataset(Dataset):
 
 
 class GSRTonicDataset(Dataset):
+  """
+    GSRTonicDataset performs Min-Max scaling and extracts Tonic component with cxvEda.
+    After the processing, it windows the data by the given window size.
+  """
   def __init__(self, csv_file, window):
     super().__init__()
 
@@ -95,6 +107,10 @@ class GSRTonicDataset(Dataset):
 
 
 class GSRPhasicDataset(Dataset):
+  """
+    GSRPhasicDataset performs Min-Max scaling and extracts Phasic component with cxvEda.
+    After the processing, it windows the data by the given window size.
+  """
   def __init__(self, csv_file, window):
     super().__init__()
 

@@ -17,7 +17,10 @@ def viz_plots():
   return False
 
 def SVMModels(X_train,y_train, X_test, y_test, scoring='accuracy'):
-
+    """
+      Performs Grid Search on Linear SVM Models. It also plot the confusion matrix
+      for training and testing data, alongwith the ROC Curve.
+    """
     param_grid = [{
         "loss": ['hinge'],
         "penalty": ['l1',],
@@ -29,8 +32,6 @@ def SVMModels(X_train,y_train, X_test, y_test, scoring='accuracy'):
 
     clf = SGDClassifier()
     params = perform_classifier_gs(clf, param_grid, X_train, y_train, scoring=scoring)[0]
-
-
 
     # Evaluate SVM model with linear kernel  model with Stochastic SVM
     clf = SGDClassifier(**params, random_state=42)
@@ -62,27 +63,20 @@ def SVMModels(X_train,y_train, X_test, y_test, scoring='accuracy'):
     return clf, params
 
 def Radial_SVMModels(X_train,y_train, X_test, y_test, scoring='accuracy'):
-
+    """
+      Performs Grid Search on RBF SVM Models. It also plot the confusion matrix
+      for training and testing data, alongwith the ROC Curve.
+    """
+    
     param_grid = [{
       "C": [0.01, 1,10],
       "gamma": ['auto', 'scale', 0.1, 0.001, 10, 100],
       "kernel": ['rbf'],
       "class_weight": ['balanced', None, {2: 1, 3: 15}],
     }]
-    # param_grid = [{
-    #   "C": [0.001,],
-    #   "gamma": ['scale'],
-    #   "kernel": ['rbf'],
-    #   "max_iter": [10000],
-    #   "class_weight": ['balanced']
-    # }]
+
     clf = SVC()
-
     params = perform_classifier_gs(clf, param_grid, X_train, y_train, scoring=scoring)[0]
-    # phasic and normal - params = {'C': 30000, 'class_weight': None, 'gamma': 15000, 'kernel': 'rbf'}
-    # params = {'C': 30000, 'class_weight': None, 'gamma': 15000, 'kernel': 'rbf'}
-
-
 
     # Evaluate SVM model with linear kernel  model with Stochastic SVM
     clf = SVC(**params, random_state=42)
@@ -113,7 +107,10 @@ def Radial_SVMModels(X_train,y_train, X_test, y_test, scoring='accuracy'):
     return clf, params
 
 def XGBoostModels(X_train,y_train, X_test, y_test, scoring='accuracy'):
-
+    """
+      Performs Grid Search on Xgboost Models. It also plot the confusion matrix
+      for training and testing data, alongwith the ROC Curve.
+    """
     param_grid = [{
       "learning_rate": [0.001,],
       "n_estimators": [200],
@@ -155,7 +152,10 @@ def XGBoostModels(X_train,y_train, X_test, y_test, scoring='accuracy'):
     return XGBmodel, params
 
 def KNNModels(X_train, y_train, X_test, y_test, scoring='accuracy'):
-
+    """
+      Performs Grid Search on kNN Models. It also plot the confusion matrix
+      for training and testing data, alongwith the ROC Curve.
+    """
     #create KNN model and fit the model with train dataset
     clf = KNeighborsClassifier()
 
@@ -205,6 +205,11 @@ cols = ['model', 'training_accuracy', 'training_balanced_accuracy', 'training_re
 classfiers = {'knn':KNNModels, 'rbf':Radial_SVMModels, 'svm':SVMModels, 'xgboost': XGBoostModels}
 
 def compile_grid_search(folder, k, file_name, s_type=''):
+  """
+    Runs Grid Search on Knn, RBF SVM, SVM and Xgboost.
+    Returns all models and their metrics, accuracy, balanced accuracy and specificity
+    in pd.Dataframe. 
+  """
   models = dict()
   file_name = folder + file_name
 

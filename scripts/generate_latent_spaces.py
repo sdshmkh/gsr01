@@ -24,8 +24,8 @@ csv_dataset = 'gsr_data/contractive/gsr_data.csv'
 
 all_datasets = [GSRDataset(csv_dataset, 51), GSRLowRankDataset(csv_dataset, 51), GSRPhasicDataset(csv_dataset, 51), GSRTonicDataset(csv_dataset, 51)]
 
+# ietrate every dataset
 for dataset in all_datasets:
-
     test_dataset, train_val_dataset = torch.utils.data.random_split(dataset, [int(0.2 * len(dataset)), len(dataset) - int(0.2 * len(dataset))])
     val_dataset, train_dataset = torch.utils.data.random_split(train_val_dataset, [int(0.2 * len(train_val_dataset)), len(train_val_dataset) - int(0.2 * len(train_val_dataset))])
     dl = DataLoader(train_dataset, batch_size=32, shuffle=True)
@@ -42,6 +42,7 @@ for dataset in all_datasets:
     decoded_signals = list()
     idx = 0
     lines, labels = list(), list()
+    # iterate over every llatent space configuration
     for k, v in arch_list:
         model = AutoEncoder(k)
         losses = training_loop(model, dl, val_dl, 20, 0.001, 0.001)
@@ -58,6 +59,7 @@ for dataset in all_datasets:
 
         print(f"\n Test Loss: {test_loss}")
 
+        # store latent spaces
         ls = model.get_latent_space(dataset.gsr_signal.squeeze(2)).unsqueeze(2).numpy()
         decoded_signal = model(dataset.gsr_signal.squeeze(2)).detach().numpy()
         decoded_signals.append(decoded_signal)

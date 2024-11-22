@@ -93,12 +93,17 @@ if not output_path.exists():
     output_path.mkdir(parents=True)
 
 all_models = dict()
+
+# for all datasets 
 for data_type, files in data_files.items():
     ls_df = list()
+    # for all latent spaces generated for these datasets
     for k, v in files.items():
+        # compile grid search on all models
         models, results_df = compile_grid_search(folder, k, v, s_type=data_type)
         if not (models and results_df):
             continue
+        # store panda dataframes
         res_path = output_path.joinpath('{}_results_{}.csv'.format(data_type, k))
         all_models |= models
         results_df.to_csv(str(res_path))
@@ -109,11 +114,13 @@ for data_type, files in data_files.items():
     
         ls_df.append(results_df)
 
+    # combine results from all latent spaces for a dataset
     merged_df = pd.concat(ls_df, ignore_index=True)
     merged_df.dropna(inplace=True)
     spec_acc_df = merged_df[merged_df["grid_search"] == "specificity"]
     bal_acc_df = merged_df[merged_df["grid_search"] == "balanced_accuracy"]
 
+    # visualize the best models for a dataset
     best_model = merged_df[merged_df['balanced_accuracy'] == merged_df['balanced_accuracy'].max()]
     plot_bar(spec_acc_df, "balanced_accuracy", "Balanced Accuracy", " {} Latent Space - Train session 1&2, Test Session 3, Grid Search Metric - Speicificity".format(data_type))
     plot_bar(bal_acc_df, "balanced_accuracy", "Balanced Accuracy", " {} Latent Space - Train session 1&2, Test Session 3, Grid Search Metric - Balanced Accuracy".format(data_type))
